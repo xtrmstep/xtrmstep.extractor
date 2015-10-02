@@ -13,7 +13,7 @@ namespace Xtrmstep.Extractor.Core.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201510020852491_Initial"; }
+            get { return "201510021125474_Initial"; }
         }
         
         string IMigrationMetadata.Source

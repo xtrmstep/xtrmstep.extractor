@@ -42,7 +42,7 @@ namespace Xtrmstep.Extractor.Core
         }
 
         public ExtractorDbContext()
-            : base("ExtractorDbContext")
+            : base("ExtractorDb")
         {
         }
 
