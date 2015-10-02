@@ -32,9 +32,8 @@ namespace Extractor
         private static IContainer CreateIoC()
         {
             ContainerBuilder builder = new ContainerBuilder();
-            builder.RegisterType<ExtractorDbContext>().As<DbContext>().InstancePerLifetimeScope();
-            builder.Register(c => c.Resolve<DbContext>()).As<IDbContext>().InstancePerLifetimeScope();
-            builder.Register(c => c.Resolve<DbContext>()).As<IUnitOfWork>().InstancePerLifetimeScope();
+            builder.RegisterType<ExtractorDbContext>().As<IDbContext>().InstancePerLifetimeScope();
+            builder.Register(c => (ExtractorDbContext)c.Resolve<IDbContext>()).As<IUnitOfWork>().InstancePerLifetimeScope();
 
             builder.Register(c => c.Resolve<IDbContext>().Pages).As<IDbSet<WebPage>>().InstancePerLifetimeScope();
 
