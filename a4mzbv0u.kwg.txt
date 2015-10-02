@@ -1,0 +1,19 @@
+﻿Db name is fixed in connection string
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# Changes to be committed:
+#	modified:   Extractor/Extractor.DataStorage/App.config
+#	modified:   Extractor/Extractor.DataStorage/Extractor.Core.csproj
+#	modified:   Extractor/Extractor.DataStorage/ExtractorDbContext.cs
+#	renamed:    Extractor/Extractor.DataStorage/Migrations/201510020852491_Initial.Designer.cs -> Extractor/Extractor.DataStorage/Migrations/201510021125474_Initial.Designer.cs
+#	renamed:    Extractor/Extractor.DataStorage/Migrations/201510020852491_Initial.cs -> Extractor/Extractor.DataStorage/Migrations/201510021125474_Initial.cs
+#	renamed:    Extractor/Extractor.DataStorage/Migrations/201510020852491_Initial.resx -> Extractor/Extractor.DataStorage/Migrations/201510021125474_Initial.resx
+#	deleted:    Extractor/Extractor.DataStorage/Properties/Settings.Designer.cs
+#	deleted:    Extractor/Extractor.DataStorage/Properties/Settings.settings
+#	modified:   Extractor/Extractor/App.config
+#
+
