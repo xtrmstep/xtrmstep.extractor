@@ -1,27 +1,53 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using Newtonsoft.Json;
+using Xtrmstep.Extractor.Core.Model;
 
 namespace Xtrmstep.Extractor.Core
 {
     public class FileReader
     {
-        public NameValueCollection Read(string fileName)
+        const int MAX_BLOCK_LENGTH = 1024;
+
+        public class JsonFormat
         {
-            NameValueCollection collection = new NameValueCollection();
-            string data = File.ReadAllText(fileName);
-            object obj = JsonConvert.DeserializeObject(data);
-            dynamic[] arrayOfObj = obj as dynamic[];
-            if (arrayOfObj != null)
+            public string url { get; set; }
+            public string result { get; set; }
+        }
+
+        public IEnumerable<JsonFormat> Read(string fileName)
+        {
+            var reader = new Json80LegsFormatReader();
+
+            Func<Json80LegsFormatReader, JsonFormat> f = t =>
+           {
+               var entry = reader.GetEntry();
+               return new JsonFormat
+               {
+                   url = entry["url"],
+                   result = entry["result"]
+               };
+           };
+
+            using (StreamReader sr = new StreamReader(fileName))
             {
-                foreach (dynamic item in arrayOfObj)
+                char[] buffer = new char[MAX_BLOCK_LENGTH];
+                while (!sr.EndOfStream)
                 {
-                    string url = item.url;
-                    string result = item.result;
-                    collection.Add(url, result);
+                    var readCount = sr.ReadBlock(buffer, 0, MAX_BLOCK_LENGTH);
+                    for (int i = 0; i < readCount; i++)
+                    {
+                        char symbol = buffer[i];
+                        if (reader.Read(symbol))
+                        {
+                            yield return f(reader);
+                        }
+                    }
                 }
             }
-            return collection;
+            yield return f(reader);
         }
 
         public string[] LookupFiles(string dirName)

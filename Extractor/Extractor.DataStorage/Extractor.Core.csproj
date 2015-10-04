@@ -59,6 +59,7 @@
     <Compile Include="FileReader.cs" />
     <Compile Include="IDbContext.cs" />
     <Compile Include="IUnitOfWork.cs" />
+    <Compile Include="JsonToWebPageConverter.cs" />
     <Compile Include="Migrations\201510021125474_Initial.cs" />
     <Compile Include="Migrations\201510021125474_Initial.Designer.cs">
       <DependentUpon>201510021125474_Initial.cs</DependentUpon>

@@ -63,13 +63,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileReaderTests.cs" />
+    <Compile Include="Json80LegsFormatReaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TestData\jsonPages.txt" />
+    <ProjectReference Include="..\Extractor.DataStorage\Extractor.Core.csproj">
+      <Project>{300ac424-0d4b-423d-9675-e65530f761df}</Project>
+      <Name>Extractor.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

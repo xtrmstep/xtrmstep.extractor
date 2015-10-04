@@ -25,7 +25,7 @@ namespace Extractor
             foreach (var fileName in files)
             {
                 var data = fileReader.Read(fileName);
-                extractor.Save(data);
+                //extractor.Save(data);
             }
         }
 
