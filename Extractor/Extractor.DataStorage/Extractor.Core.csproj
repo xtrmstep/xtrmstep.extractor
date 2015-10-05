@@ -56,19 +56,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileReader.cs" />
+    <Compile Include="JsonBufferedReader.cs" />
+    <Compile Include="JsonFileReader.cs" />
     <Compile Include="IDbContext.cs" />
     <Compile Include="IUnitOfWork.cs" />
-    <Compile Include="JsonToWebPageConverter.cs" />
+    <Compile Include="JsonFormats\Json80LegsFormat.cs" />
     <Compile Include="Migrations\201510021125474_Initial.cs" />
     <Compile Include="Migrations\201510021125474_Initial.Designer.cs">
       <DependentUpon>201510021125474_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Model\WebPage.cs" />
-    <Compile Include="DataExtractor.cs" />
+    <Compile Include="Impl\DataExtractor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ExtractorDbContext.cs" />
+    <Compile Include="Impl\ExtractorDbContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

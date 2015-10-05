@@ -1,22 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Xtrmstep.Extractor.Core.JsonFormats;
 using Xunit;
 
 namespace Xtrmstep.Extractor.Core.Tests
 {
     public class FileReaderTests
     {
-        const string testDataFolder = @"c:\TestData\";
+        private const string testDataFolder = @"c:\TestData\";
 
         [Fact(DisplayName = "Read JSON Files / One entry")]
         public void Should_read_an_entry()
         {
-            var filePath = testDataFolder + "jsonFormat.txt";
-            var fileReader = new FileReader();
-            var values = fileReader.Read(filePath).ToArray();
+            string filePath = testDataFolder + "jsonFormat.txt";
+            JsonFileReader fileReader = new JsonFileReader();
+            Json80LegsFormat[] values = fileReader.Read(filePath, Json80LegsFormat.Converter).ToArray();
 
             Assert.Equal(1, values.Length);
             Assert.Equal("url_text", values[0].url);
@@ -26,9 +24,9 @@ namespace Xtrmstep.Extractor.Core.Tests
         [Fact(DisplayName = "Read JSON Files / Several entries")]
         public void Should_read_sequence()
         {
-            var filePath = testDataFolder + "jsonSequence.txt";
-            var fileReader = new FileReader();
-            var values = fileReader.Read(filePath).ToArray();
+            string filePath = testDataFolder + "jsonSequence.txt";
+            JsonFileReader fileReader = new JsonFileReader();
+            Json80LegsFormat[] values = fileReader.Read(filePath, Json80LegsFormat.Converter).ToArray();
 
             Assert.Equal(2, values.Length);
             Assert.Equal("url_text_1", values[0].url);

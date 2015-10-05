@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Specialized;
+using System.Text.RegularExpressions;
 using Xunit;
 
 namespace Xtrmstep.Extractor.Core.Tests
@@ -13,9 +10,9 @@ namespace Xtrmstep.Extractor.Core.Tests
         public void GetMatches_should_match_json_one_parameter()
         {
             string text = @"{""key"":""value""}";
-            var reader = new Json80LegsFormatReader();
+            JsonBufferedReader reader = new JsonBufferedReader();
 
-            var matches = reader.GetMatches(text);
+            MatchCollection matches = reader.GetJsonKeyValues(text);
 
             Assert.NotNull(matches);
             Assert.Equal(1, matches.Count);
@@ -27,9 +24,9 @@ namespace Xtrmstep.Extractor.Core.Tests
         public void GetMatches_should_match_json_two_parameters()
         {
             string text = @"{""key1"":""value1"",""key2"":""value2""}";
-            var reader = new Json80LegsFormatReader();
+            JsonBufferedReader reader = new JsonBufferedReader();
 
-            var matches = reader.GetMatches(text);
+            MatchCollection matches = reader.GetJsonKeyValues(text);
 
             Assert.NotNull(matches);
             Assert.Equal(2, matches.Count);
@@ -43,13 +40,16 @@ namespace Xtrmstep.Extractor.Core.Tests
         public void GetMatches_should_read_json_one_parameter()
         {
             string text = @"{""key1"":""value1"",""key2"":""value2""}";
-            var reader = new Json80LegsFormatReader();
+            JsonBufferedReader reader = new JsonBufferedReader();
 
-            foreach (var symbol in text)
+            foreach (char symbol in text)
             {
-                if (reader.Read(symbol)) break; // entry is ready
+                if (reader.Read(symbol))
+                {
+                    break; // entry is ready
+                }
             }
-            var result = reader.GetEntry();
+            NameValueCollection result = reader.GetEntry();
 
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
