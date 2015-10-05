@@ -9,7 +9,7 @@ namespace Xtrmstep.Extractor.Core.Tests
 {
     public class FileReaderTests
     {
-        const string testDataFolder = @"f:\TestData\";
+        const string testDataFolder = @"c:\TestData\";
 
         [Fact(DisplayName = "Read JSON Files / One entry")]
         public void Should_read_an_entry()
@@ -26,7 +26,15 @@ namespace Xtrmstep.Extractor.Core.Tests
         [Fact(DisplayName = "Read JSON Files / Several entries")]
         public void Should_read_sequence()
         {
-            throw new NotImplementedException();
+            var filePath = testDataFolder + "jsonSequence.txt";
+            var fileReader = new FileReader();
+            var values = fileReader.Read(filePath).ToArray();
+
+            Assert.Equal(2, values.Length);
+            Assert.Equal("url_text_1", values[0].url);
+            Assert.Equal("html_text_1", values[0].result);
+            Assert.Equal("url_text_2", values[1].url);
+            Assert.Equal("html_text_2", values[1].result);
         }
 
         [Fact(DisplayName = "Read JSON Files / Big file")]
