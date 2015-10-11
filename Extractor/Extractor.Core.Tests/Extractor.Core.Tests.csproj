@@ -63,7 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileReaderTests.cs" />
-    <Compile Include="Json80LegsFormatReaderTests.cs" />
+    <Compile Include="JsonBufferedReaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

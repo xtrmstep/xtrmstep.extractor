@@ -13,7 +13,7 @@ namespace Xtrmstep.Extractor.Core
         {
             Func<JsonBufferedReader, TJsonFormat> materializeBuffer = reader =>
             {
-                NameValueCollection entry = reader.GetEntry();
+                NameValueCollection entry = reader.PopEntry();
                 return converter(entry);
             };
 
@@ -34,7 +34,6 @@ namespace Xtrmstep.Extractor.Core
                     }
                 }
             }
-            yield return materializeBuffer(jsonBufferedReader);
         }
 
         public string[] LookupFiles(string dirName)

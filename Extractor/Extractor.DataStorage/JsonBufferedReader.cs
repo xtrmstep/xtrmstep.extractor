@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
@@ -7,113 +8,116 @@ namespace Xtrmstep.Extractor.Core
 {
     public class JsonBufferedReader
     {
-        private readonly char[] _skippedSymbols =
+        enum ReaderState
         {
-            '[', ']'
-        };
+            EntryStart,
+            EntryEnd,
+            KeyStart,
+            KeyRead,
+            KeyEnd,
+            ValueStart,
+            ValueRead,
+            ValueEnd,
+            KeySpecialChar,
+            ValueSpecialChar
+        }
 
         private StringBuilder _buffer = new StringBuilder();
-        private int _counterArray;
-        private int _counterObject;
-        private int _counterScoupe;
-        private int _lastArray;
-        private int _lastObject;
-        private int _lastScoupe;
-
-        private void Reset()
-        {
-            _buffer = _buffer ?? new StringBuilder();
-            _buffer.Length = 0;
-
-            _counterArray = 0;
-            _counterObject = 0;
-            _counterScoupe = 0;
-            _lastArray = 0;
-            _lastObject = 0;
-            _lastScoupe = 0;
-        }
+        private ReaderState _readerState = ReaderState.EntryStart;
+        private Stack<NameValueCollection> _entries = new Stack<NameValueCollection>();
+        private StringBuilder _currentKey = new StringBuilder();
+        private StringBuilder _currentValue = new StringBuilder();
+        private NameValueCollection _currentEntry = new NameValueCollection();
 
         public bool Read(char symbol)
         {
-            // todo: get rid of useless cases
-            switch (symbol)
+            var currentState = _readerState;
+            switch (_readerState)
             {
-                case '[':
-                    _lastArray = _counterArray++;
+                #region starting
+                case ReaderState.EntryStart:
+                    if (symbol == '{')
+                        _readerState = ReaderState.KeyStart;
                     break;
-                case ']':
-                    if (_lastArray == _counterArray)
-                    {
-                        _lastArray = --_counterArray;
-                    }
-                    else
-                    {
-                        --_counterArray;
-                    }
+                case ReaderState.KeyStart:
+                    if (symbol == '"')
+                        _readerState = ReaderState.KeyRead;
                     break;
-                case '{':
-                    _lastObject = _counterObject++;
-                    break;
-                case '}':
-                    if (_lastObject == _counterObject)
+                case ReaderState.ValueStart:
+                    if (symbol == '"')
+                        _readerState = ReaderState.ValueRead;
+                    break; 
+                #endregion
+                #region reading
+                case ReaderState.KeyRead:
+                    switch(symbol)
                     {
-                        _lastObject = --_counterObject;
-                    }
-                    else
-                    {
-                        --_counterObject;
+                        case '"': _readerState = ReaderState.KeyEnd; break;
+                        case '\\': _readerState = ReaderState.KeySpecialChar; _buffer.Append(symbol); break;
+                        default: _buffer.Append(symbol); break;
                     }
                     break;
-                case '(':
-                    _lastScoupe = _counterScoupe++;
-                    break;
-                case ')':
-                    if (_lastScoupe == _counterScoupe)
+                case ReaderState.ValueRead:
+                    switch (symbol)
                     {
-                        _lastScoupe = --_counterScoupe;
-                    }
-                    else
-                    {
-                        --_counterScoupe;
+                        case '"': _readerState = ReaderState.ValueEnd; break;
+                        case '\\': _readerState = ReaderState.ValueSpecialChar; _buffer.Append(symbol); break;
+                        default: _buffer.Append(symbol); break;
                     }
                     break;
-                case ',':
-                    if (_lastObject == _counterObject)
-                    {
-                        return true; // end of object and value is ready
-                    }
+                case ReaderState.KeySpecialChar:
+                    _readerState = ReaderState.KeyRead;
+                    _buffer.Append(symbol);
                     break;
-            }
+                case ReaderState.ValueSpecialChar:
+                    _readerState = ReaderState.ValueRead;
+                    _buffer.Append(symbol);
+                    break;
+                #endregion
+                #region ending
+                case ReaderState.EntryEnd:
+                    if (symbol == ',')
+                        _readerState = ReaderState.EntryStart;
+                    break;
+                case ReaderState.KeyEnd:
+                    if (symbol == ':')
+                        _readerState = ReaderState.ValueStart;
+                    break;
+                case ReaderState.ValueEnd:
+                    if (symbol == ',')
+                        _readerState = ReaderState.KeyStart;
+                    if (symbol == '}')
+                        _readerState = ReaderState.EntryEnd;
+                    break; 
+                    #endregion
+            }            
 
-            // skip some symbols from buffer
-            if (_skippedSymbols.Contains(symbol) == false)
+            if (_readerState == ReaderState.KeyEnd)
             {
-                _buffer.Append(symbol);
+                _currentKey.Append(_buffer.ToString());
+                _buffer.Length = 0;
             }
+            if (_readerState == ReaderState.ValueEnd)
+            {
+                _currentValue.Append(_buffer.ToString());
+                _buffer.Length = 0;
 
+                _currentEntry.Add(_currentKey.ToString(), _currentValue.ToString());
+                _currentKey.Length = 0;
+                _currentValue.Length = 0;
+            }
+            if (_readerState == ReaderState.EntryEnd && currentState != _readerState) // only if changed
+            {
+                _entries.Push(_currentEntry);
+                _currentEntry = new NameValueCollection();
+                return true;
+            }
             return false;
         }
 
-        public MatchCollection GetJsonKeyValues(string text)
+        public NameValueCollection PopEntry()
         {
-            const string pattern = "(?<entry>[\"](?<key>\\w+)[\"]:[\"](?<value>\\w+)[\"])";
-            return Regex.Matches(text, pattern);
-        }
-
-        public NameValueCollection GetEntry()
-        {
-            MatchCollection matches = GetJsonKeyValues(_buffer.ToString());
-            NameValueCollection result = new NameValueCollection();
-            foreach (Match match in matches)
-            {
-                string key = match.Groups["key"].Value;
-                string value = match.Groups["value"].Value;
-                result.Add(key, value);
-            }
-
-            Reset();
-
-            return result;
+            return _entries.Pop();
         }
     }
 }

@@ -1,12 +1,22 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Xtrmstep.Extractor.Core.JsonFormats;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Xtrmstep.Extractor.Core.Tests
 {
     public class FileReaderTests
     {
+        private ITestOutputHelper output;
+
+        public FileReaderTests(ITestOutputHelper output)
+        {
+            this.output = output;
+        }
+
         private const string testDataFolder = @"c:\TestData\";
 
         [Fact(DisplayName = "Read JSON Files / One entry")]
@@ -38,7 +48,39 @@ namespace Xtrmstep.Extractor.Core.Tests
         [Fact(DisplayName = "Read JSON Files / Big file")]
         public void Should_read_big_file()
         {
-            throw new NotImplementedException();
+            string filePath = testDataFolder + "jsonBigFileAndPages.txt"; // 38Mb
+            JsonFileReader fileReader = new JsonFileReader();
+            var values = fileReader.Read(filePath, Json80LegsFormat.Converter);
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            var count = 0;
+            foreach (var value in values)
+            {
+                Assert.NotNull(value.url);
+                Assert.NotNull(value.result);
+                count++;
+            }
+            sw.Stop();
+            output.WriteLine("Read {0} entries in {1} ms ({2} ticks)", count, sw.ElapsedMilliseconds, sw.ElapsedTicks);
         }
+
+        [Fact(DisplayName = "Read JSON Files / Html content in file")]
+        public void Should_read_html_content()
+        {
+            string filePathJson = testDataFolder + "jsonHtmlContent.txt";
+            string filePathHtml = testDataFolder + "htmlContent.txt";
+            
+            JsonFileReader fileReader = new JsonFileReader();
+            var values = fileReader.Read(filePathJson, Json80LegsFormat.Converter).ToArray();
+
+            var expected = File.ReadAllText(filePathHtml);
+
+            Assert.Equal(1, values.Length);
+
+            Assert.Equal("url/value", values[0].url);
+            Assert.Equal(expected, values[0].result);
+        }
+
     }
 }
