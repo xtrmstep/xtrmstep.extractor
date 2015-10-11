@@ -21,7 +21,7 @@ namespace Extractor
             foreach (string fileName in files)
             {
                 IEnumerable<Json80LegsFormat> data = fileReader.Read(fileName, Json80LegsFormat.Converter);
-                //extractor.Save(data);
+                extractor.Save(data);
             }
         }
 

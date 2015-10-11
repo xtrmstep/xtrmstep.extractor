@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Reflection;
 using log4net;
+using Xtrmstep.Extractor.Core.JsonFormats;
 using Xtrmstep.Extractor.Core.Model;
 
 namespace Xtrmstep.Extractor.Core
@@ -36,28 +37,33 @@ namespace Xtrmstep.Extractor.Core
             return result;
         }
 
-        public void Save(NameValueCollection data)
+        public void Save(IEnumerable<Json80LegsFormat> data)
         {
-            IEnumerable<WebPage> pages = Read(data);
-            Save(pages);
+            foreach (var item in data)
+            {
+                var webPage = new WebPage
+                {
+                    Url = item.url,
+                    Content = item.result
+                };
+                Save(webPage);
+            }
         }
 
-        public void Save(IEnumerable<WebPage> pages)
+        public void Save(WebPage page)
         {
+            // update exiting and store new pages
             try
             {
-                foreach (WebPage insertingPage in pages)
+                WebPage existingPage = dbPages.SingleOrDefault(p => p.Url == page.Url);
+                if (existingPage != null)
                 {
-                    WebPage existingPage = dbPages.SingleOrDefault(p => p.Url == insertingPage.Url);
-                    if (existingPage != null)
-                    {
-                        existingPage.Content = insertingPage.Content;
-                    }
-                    else
-                    {
-                        insertingPage.Id = Guid.NewGuid();
-                        dbPages.Add(insertingPage);
-                    }
+                    existingPage.Content = page.Content;
+                }
+                else
+                {
+                    page.Id = Guid.NewGuid();
+                    dbPages.Add(page);
                 }
                 unitOfWork.Commit();
             }

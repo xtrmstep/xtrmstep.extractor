@@ -57,7 +57,7 @@ namespace Xtrmstep.Extractor.Core.Tests
             var count = 0;
             foreach (var value in values)
             {
-                Assert.NotNull(value.url);
+                Assert.NotNull(value.url); // duplicates are not skipped
                 Assert.NotNull(value.result);
                 count++;
             }
